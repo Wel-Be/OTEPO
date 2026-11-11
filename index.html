@@ -71,6 +71,9 @@ input,select{width:100%;font:inherit;color:var(--ink);background:#fff;border:2px
 .ov{position:fixed;inset:0;background:rgba(74,52,38,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
 .sheet{background:var(--bg);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
 .sheet h3{margin-bottom:6px;font-size:18px}
+.sws{display:flex;flex-wrap:wrap;gap:8px}
+.sw{appearance:none;border:3px solid transparent;background:#fff;border-radius:50%;width:50px;height:50px;padding:5px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.sw.on{border-color:var(--ink)}
 .err{color:var(--red);font-size:14px;font-weight:700;min-height:20px;margin:8px 0 0}
 .cel{align-items:center}
 .cel .box{background:#fff;border-radius:24px;padding:28px 36px;text-align:center;margin:0 20px;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
@@ -90,8 +93,8 @@ a{color:var(--o);font-weight:700}
 <div id="app"></div>
 <div id="modal"></div>
 <script>
-const VER='1.2.0',KEY='otepo.data.v1',OFUSE='https://ofuse.me/f3a8ad6a';
-const NOTES=[{v:'1.0.0',d:'2026-11-11',t:['オテポを公開しました。お手伝いでポイントをため、ごほうびと交換できます。']},{v:'1.2.0',d:'2026-11-11',t:['設定の歯車を大きく見やすくし、枠をなくしました','効果音を「チャリン、チャリン」と2回続けて鳴らすようにしました']},{v:'1.1.0',d:'2026-11-11',t:['設定ボタンを右上の歯車マークにしました','ポイントをもらったときに効果音が鳴るようになりました','初期画面のタイトルにOTEPOの表記を追加しました']}];
+const VER='1.3.0',KEY='otepo.data.v1',OFUSE='https://ofuse.me/f3a8ad6a';
+const NOTES=[{v:'1.0.0',d:'2026-11-11',t:['オテポを公開しました。お手伝いでポイントをため、ごほうびと交換できます。']},{v:'1.3.0',d:'2026-11-11',t:['設定の表記を「おてつだいするひと」「おてつだい」に変更しました','「お手伝いする人を追加」に表記を変更しました','お手伝いする人ごとにコインの色を選べるようになりました']},{v:'1.2.0',d:'2026-11-11',t:['設定の歯車を大きく見やすくし、枠をなくしました','効果音を「チャリン、チャリン」と2回続けて鳴らすようにしました']},{v:'1.1.0',d:'2026-11-11',t:['設定ボタンを右上の歯車マークにしました','ポイントをもらったときに効果音が鳴るようになりました','初期画面のタイトルにOTEPOの表記を追加しました']}];
 const MSGS=['やったね！','ありがとう！','よくできました！','すごいね！','ポイントゲット！'];
 const DEF=[['靴をならべる',1],['食器洗い',3],['お風呂掃除',3],['掃除機をかける',3],['リビングを片付ける',5]];
 const $=s=>document.querySelector(s);
@@ -101,13 +104,14 @@ const p2=n=>String(n).padStart(2,'0');
 const ymd=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
 const today=()=>ymd(new Date());
 const fmt=s=>{const [y,m,d]=s.split('-');return y+'年'+(+m)+'月'+(+d)+'日'};
+const PAL=[['#E9B44C','#F3CF7A','#D98A3D'],['#E8946A','#F3BBA0','#C0643A'],['#E59AA0','#F2BDBF','#C46A74'],['#B5533C','#D98F7C','#8A3A28'],['#9DBE86','#C3D9B1','#6E8F5A'],['#7FBDB4','#AEDAD3','#4F938A'],['#8FB4D6','#B7D0E8','#5E87AD'],['#B79BC9','#D3C0DF','#8B6BA3']];
 let S=load();
-function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.kids))return s}catch(e){}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.kids)){s.kids.forEach((k,i)=>{if(k.color==null)k.color=i%PAL.length});return s}}catch(e){}
  return{kids:[],chores:DEF.map(([name,pt])=>({id:uid(),name,pt})),log:[],seen:null}}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('保存できませんでした。ブラウザの設定を確認してください。')}}
 const V={v:'list',kid:null,month:new Date(new Date().getFullYear(),new Date().getMonth(),1),sel:null};
 const bal=id=>S.log.filter(l=>l.kid===id).reduce((a,l)=>a+(l.type==='earn'?l.pt:-l.pt),0);
-const coin=(s=40)=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#E9B44C"/><circle cx="20" cy="20" r="13" fill="#F3CF7A" stroke="#D98A3D" stroke-width="2"/><path d="M20 12l2.4 5 5.4.7-4 3.7 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.7 5.4-.7z" fill="#D98A3D"/></svg>`;
+const coin=(s=40,ci=0)=>{const[a,b,c]=PAL[ci%PAL.length];return `<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="${a}"/><circle cx="20" cy="20" r="13" fill="${b}" stroke="${c}" stroke-width="2"/><path d="M20 12l2.4 5 5.4.7-4 3.7 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.7 5.4-.7z" fill="${c}"/></svg>`};
 const SND_SRC='sound.mp3';
 let SND=null,AC=null,BUF=null;
 try{SND=new Audio(SND_SRC);SND.preload='auto'}catch(e){}
@@ -121,7 +125,8 @@ function playSound(){
 const kidObj=()=>S.kids.find(k=>k.id===V.kid);
 
 /* ---------- modal helpers ---------- */
-let CB=null;
+let CB=null,CSEL=0;
+function colorPick(){return `<label>コインの色</label><div class="sws" role="radiogroup" aria-label="コインの色">${PAL.map((_,i)=>`<button type="button" class="sw${i===CSEL?' on':''}" data-a="pickColor" data-i="${i}" role="radio" aria-checked="${i===CSEL}" aria-label="色${i+1}">${coin(36,i)}</button>`).join('')}</div>`}
 function modal(html,cls=''){$('#modal').innerHTML=`<div class="ov ${cls}"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`}
 function closeM(){$('#modal').innerHTML='';CB=null}
 function form(title,body,cb,ok='決定'){CB=cb;modal(`<h3>${title}</h3>${body}<p class="err" id="err" role="alert"></p><div class="row" style="margin-top:8px"><button class="btn g grow" data-a="close">キャンセル</button><button class="btn o grow" data-a="ok">${ok}</button></div>`);const i=$('.sheet input');if(i&&i.type==='text')i.focus()}
@@ -139,9 +144,9 @@ function render(){
 function listV(){
  return `<div class="top"><h1 class="logo">オテポ<small>OTEPO</small></h1><button class="gear" data-a="go" data-v="set" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
  <p class="tag">おてつだいで、ポイントをためよう！</p>`+
- (S.kids.length?S.kids.map(k=>`<button class="kid" data-a="openKid" data-id="${k.id}">${coin(44)}<span class="nm">${esc(k.name)}</span><span class="pt">${bal(k.id)}<small>pt</small></span></button>`).join('')
- :`<div class="card"><p class="empty">まだ子供が登録されていません。<br>名前を追加してはじめましょう。</p></div>`)+
- `<button class="btn o w" style="min-height:54px" data-a="addKid">＋ 子供を追加</button>`;
+ (S.kids.length?S.kids.map(k=>`<button class="kid" data-a="openKid" data-id="${k.id}">${coin(44,k.color)}<span class="nm">${esc(k.name)}</span><span class="pt">${bal(k.id)}<small>pt</small></span></button>`).join('')
+ :`<div class="card"><p class="empty">まだ登録されていません。<br>お手伝いする人の名前を追加してはじめましょう。</p></div>`)+
+ `<button class="btn o w" style="min-height:54px" data-a="addKid">＋ お手伝いする人を追加</button>`;
 }
 function kidV(){
  const k=kidObj(),y=V.month.getFullYear(),m=V.month.getMonth();
@@ -154,7 +159,7 @@ function kidV(){
   cells+=`<button class="c${ds===t?' t':''}${ds===V.sel?' sel':''}" data-a="selDay" data-d="${ds}" aria-label="${fmt(ds)}">${d}${s&&s.a?`<i class="a">+${s.a}</i>`:''}${s&&s.b?`<i class="b">−${s.b}</i>`:''}</button>`}
  const list=(V.sel?mine.filter(l=>l.date===V.sel):mine).slice().reverse().sort((a,b)=>b.date.localeCompare(a.date));
  return `<div class="top"><button class="btn g s" data-a="go" data-v="list">← 戻る</button><h2></h2></div>
- <div class="card hero"><div class="nm">${esc(k.name)}</div>${coin(48)}<div class="big">${bal(k.id)}<small>pt</small></div></div>
+ <div class="card hero"><div class="nm">${esc(k.name)}</div>${coin(48,k.color)}<div class="big">${bal(k.id)}<small>pt</small></div></div>
  <div class="acts"><button class="btn o" data-a="earn">ポイントをもらう</button><button class="btn" data-a="spend">ポイントを使う</button></div>
  <div class="card"><div class="mon"><button class="btn g s" data-a="mon" data-n="-1" aria-label="前の月">◀</button><b>${y}年${m+1}月</b><button class="btn g s" data-a="mon" data-n="1" aria-label="次の月">▶</button></div><div class="cal">${cells}</div></div>
  <div class="card"><div class="mon"><b>${V.sel?fmt(V.sel)+'の履歴':'すべての履歴'}</b>${V.sel?'<button class="btn g s" data-a="selDay" data-d="">すべて表示</button>':''}</div>
@@ -162,8 +167,8 @@ function kidV(){
 }
 function setV(){
  return `<div class="top"><button class="btn g s" data-a="go" data-v="list">← 戻る</button><h2>設定</h2></div>
- <div class="card"><h3>子供の管理</h3>${S.kids.length?S.kids.map(k=>`<div class="hist"><div class="l">${esc(k.name)}</div><button class="btn g s" data-a="renKid" data-id="${k.id}">名前変更</button><button class="btn d s" data-a="delKid" data-id="${k.id}">削除</button></div>`).join(''):'<p class="empty">子供が登録されていません</p>'}<button class="btn w" style="margin-top:8px" data-a="addKid">＋ 子供を追加</button></div>
- <div class="card"><h3>お手伝いの管理</h3>${S.chores.length?S.chores.map(c=>`<div class="hist"><div class="l">${esc(c.name)}<small>${c.pt}pt</small></div><button class="btn g s" data-a="editChore" data-id="${c.id}">編集</button><button class="btn d s" data-a="delChore" data-id="${c.id}">削除</button></div>`).join(''):'<p class="empty">お手伝いが登録されていません</p>'}<button class="btn w" style="margin-top:8px" data-a="editChore" data-id="">＋ お手伝いを追加</button></div>
+ <div class="card"><h3>おてつだいするひと</h3>${S.kids.length?S.kids.map(k=>`<div class="hist"><div class="l">${esc(k.name)}</div><button class="btn g s" data-a="renKid" data-id="${k.id}">名前・色を変更</button><button class="btn d s" data-a="delKid" data-id="${k.id}">削除</button></div>`).join(''):'<p class="empty">登録されていません</p>'}<button class="btn w" style="margin-top:8px" data-a="addKid">＋ お手伝いする人を追加</button></div>
+ <div class="card"><h3>おてつだい</h3>${S.chores.length?S.chores.map(c=>`<div class="hist"><div class="l">${esc(c.name)}<small>${c.pt}pt</small></div><button class="btn g s" data-a="editChore" data-id="${c.id}">編集</button><button class="btn d s" data-a="delChore" data-id="${c.id}">削除</button></div>`).join(''):'<p class="empty">お手伝いが登録されていません</p>'}<button class="btn w" style="margin-top:8px" data-a="editChore" data-id="">＋ お手伝いを追加</button></div>
  <div class="card"><h3>アプリ情報</h3><p>オテポ（OTEPO）<br>おてつだいで、ポイントをためよう！<br><span class="note">開発者：Wel (Be)</span></p>
  <p class="note">データはこの端末のブラウザ内にだけ保存されます。ブラウザのデータ消去・故障・機種変更で消えると復元できません。</p>
  <div class="row"><span class="grow">バージョン ${VER}</span><button class="btn g s" data-a="notes">更新内容</button></div></div>
@@ -179,8 +184,10 @@ const A={
  openKid(d){V.kid=d.id;V.v='kid';V.sel=null;const n=new Date();V.month=new Date(n.getFullYear(),n.getMonth(),1);render();scrollTo(0,0)},
  mon(d){V.month=new Date(V.month.getFullYear(),V.month.getMonth()+ +d.n,1);render()},
  selDay(d){V.sel=d.d&&d.d!==V.sel?d.d:null;render()},
- addKid(){form('子供を追加','<label for="nm">名前</label><input id="nm" type="text" maxlength="30" autocomplete="off">',()=>{const n=$('#nm').value.trim();if(!n)return fail('名前を入力してください');S.kids.push({id:uid(),name:n});save();render()},'追加')},
- renKid(d){const k=S.kids.find(x=>x.id===d.id);form('名前を変更',`<label for="nm">名前</label><input id="nm" type="text" maxlength="30" value="${esc(k.name)}">`,()=>{const n=$('#nm').value.trim();if(!n)return fail('名前を入力してください');k.name=n;save();render()},'変更')},
+ pickColor(d){CSEL=+d.i;document.querySelectorAll('.sw').forEach(b=>{const on=+b.dataset.i===CSEL;b.classList.toggle('on',on);b.setAttribute('aria-checked',on)})},
+ addKid(){const used=S.kids.map(k=>k.color);const f=PAL.findIndex((_,i)=>!used.includes(i));CSEL=f>=0?f:S.kids.length%PAL.length;
+  form('お手伝いする人を追加','<label for="nm">名前</label><input id="nm" type="text" maxlength="30" autocomplete="off">'+colorPick(),()=>{const n=$('#nm').value.trim();if(!n)return fail('名前を入力してください');S.kids.push({id:uid(),name:n,color:CSEL});save();render()},'追加')},
+ renKid(d){const k=S.kids.find(x=>x.id===d.id);CSEL=k.color;form('名前・色を変更',`<label for="nm">名前</label><input id="nm" type="text" maxlength="30" value="${esc(k.name)}">`+colorPick(),()=>{const n=$('#nm').value.trim();if(!n)return fail('名前を入力してください');k.name=n;k.color=CSEL;save();render()},'変更')},
  delKid(d){const k=S.kids.find(x=>x.id===d.id);confirmM(`「${esc(k.name)}」を削除しますか？<br>ポイントや履歴もすべて消え、元に戻せません。`,()=>{S.kids=S.kids.filter(x=>x.id!==k.id);S.log=S.log.filter(l=>l.kid!==k.id);save();render()},'削除する')},
  editChore(d){const c=S.chores.find(x=>x.id===d.id);form(c?'お手伝いを編集':'お手伝いを追加',`<label for="cn">お手伝いの名前</label><input id="cn" type="text" maxlength="30" value="${c?esc(c.name):''}"><label for="cp">獲得ポイント</label><input id="cp" type="number" inputmode="numeric" min="1" step="1" value="${c?c.pt:''}">`,()=>{const n=$('#cn').value.trim(),p=Number($('#cp').value);if(!n)return fail('名前を入力してください');if(!Number.isInteger(p)||p<1)return fail('ポイントは1以上の整数で入力してください');if(c){c.name=n;c.pt=p}else S.chores.push({id:uid(),name:n,pt:p});save();render()},'保存')},
  delChore(d){const c=S.chores.find(x=>x.id===d.id);confirmM(`「${esc(c.name)}」を削除しますか？<br>過去の獲得履歴は残ります。`,()=>{S.chores=S.chores.filter(x=>x.id!==c.id);save();render()},'削除する')},
@@ -209,7 +216,7 @@ const A={
  undo(d){const l=S.log.find(x=>x.id===d.id);confirmM(`「${esc(l.label)}」（${l.pt}pt）の交換を取り消しますか？<br>使ったポイントは元に戻ります。`,()=>{S.log=S.log.filter(x=>x.id!==l.id);save();render()},'取り消す')}
 };
 function celebrate(){
- modal(`<div class="box">${coin(72)}<div class="msg">${MSGS[Math.floor(Math.random()*MSGS.length)]}</div></div>`.replace('class="sheet"',''),'cel');
+ modal(`<div class="box">${coin(72,kidObj()?kidObj().color:0)}<div class="msg">${MSGS[Math.floor(Math.random()*MSGS.length)]}</div></div>`.replace('class="sheet"',''),'cel');
  const ov=$('#modal .ov'),sh=$('#modal .sheet');sh.style.cssText='background:none;padding:0;width:auto;border-radius:0;overflow:visible';
  const t=setTimeout(closeM,1800);ov.addEventListener('click',()=>clearTimeout(t),{once:true});
 }
