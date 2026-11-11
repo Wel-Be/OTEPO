@@ -18,7 +18,9 @@ body{background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic","Hiragi
 h1,h2,h3{margin:0;font-weight:900}
 .top{display:flex;align-items:center;gap:8px;margin-bottom:14px}
 .top h2{flex:1;font-size:20px}
-.logo{font-size:26px;letter-spacing:.04em;color:var(--o)}
+.logo{font-size:26px;letter-spacing:.04em;color:var(--o);display:flex;align-items:baseline;gap:8px}
+.logo small{font-size:15px;letter-spacing:.14em;color:var(--sub);font-weight:700}
+.gear{margin-left:auto;width:48px;height:48px;padding:0;display:flex;align-items:center;justify-content:center;border-radius:50%}
 .tag{color:var(--sub);font-size:13px;margin:0 0 14px}
 .card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 1px 0 var(--line)}
 .btn{appearance:none;border:0;font:inherit;font-weight:700;background:var(--y);color:var(--ink);min-height:48px;padding:0 18px;border-radius:14px;cursor:pointer}
@@ -86,8 +88,8 @@ a{color:var(--o);font-weight:700}
 <div id="app"></div>
 <div id="modal"></div>
 <script>
-const VER='1.0.0',KEY='otepo.data.v1',OFUSE='https://ofuse.me/f3a8ad6a';
-const NOTES=[{v:'1.0.0',d:'2026-11-11',t:['オテポを公開しました。お手伝いでポイントをため、ごほうびと交換できます。']}];
+const VER='1.1.0',KEY='otepo.data.v1',OFUSE='https://ofuse.me/f3a8ad6a';
+const NOTES=[{v:'1.0.0',d:'2026-11-11',t:['オテポを公開しました。お手伝いでポイントをため、ごほうびと交換できます。']},{v:'1.1.0',d:'2026-11-11',t:['設定ボタンを右上の歯車マークにしました','ポイントをもらったときに効果音が鳴るようになりました','初期画面のタイトルにOTEPOの表記を追加しました']}];
 const MSGS=['やったね！','ありがとう！','よくできました！','すごいね！','ポイントゲット！'];
 const DEF=[['靴をならべる',1],['食器洗い',3],['お風呂掃除',3],['掃除機をかける',3],['リビングを片付ける',5]];
 const $=s=>document.querySelector(s);
@@ -104,6 +106,10 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('
 const V={v:'list',kid:null,month:new Date(new Date().getFullYear(),new Date().getMonth(),1),sel:null};
 const bal=id=>S.log.filter(l=>l.kid===id).reduce((a,l)=>a+(l.type==='earn'?l.pt:-l.pt),0);
 const coin=(s=40)=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#E9B44C"/><circle cx="20" cy="20" r="13" fill="#F3CF7A" stroke="#D98A3D" stroke-width="2"/><path d="M20 12l2.4 5 5.4.7-4 3.7 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.7 5.4-.7z" fill="#D98A3D"/></svg>`;
+const SND_SRC='sound.mp3';
+let SND=null;
+try{SND=new Audio(SND_SRC);SND.preload='auto'}catch(e){}
+function playSound(){try{if(!SND)return;SND.currentTime=0;const p=SND.play();if(p&&p.catch)p.catch(()=>{})}catch(e){}}
 const kidObj=()=>S.kids.find(k=>k.id===V.kid);
 
 /* ---------- modal helpers ---------- */
@@ -123,7 +129,7 @@ function render(){
  else{V.v='list';a.innerHTML=listV()}
 }
 function listV(){
- return `<div class="top"><h1 class="logo">オテポ</h1><button class="btn g s" data-a="go" data-v="set">設定</button></div>
+ return `<div class="top"><h1 class="logo">オテポ<small>OTEPO</small></h1><button class="btn g gear" data-a="go" data-v="set" aria-label="設定"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#4A3426" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button></div>
  <p class="tag">おてつだいで、ポイントをためよう！</p>`+
  (S.kids.length?S.kids.map(k=>`<button class="kid" data-a="openKid" data-id="${k.id}">${coin(44)}<span class="nm">${esc(k.name)}</span><span class="pt">${bal(k.id)}<small>pt</small></span></button>`).join('')
  :`<div class="card"><p class="empty">まだ子供が登録されていません。<br>名前を追加してはじめましょう。</p></div>`)+
@@ -180,7 +186,7 @@ const A={
    if(!n)return fail('お手伝いの内容を入力してください');
    if(!Number.isInteger(p)||p<1)return fail('ポイントは1以上の整数で入力してください');
    if(!d||d>today())return fail('日付は今日以前を選んでください');
-   S.log.push({id:uid(),kid:V.kid,type:'earn',date:d,pt:p,label:n});save();render();setTimeout(celebrate,50);},'登録')},
+   S.log.push({id:uid(),kid:V.kid,type:'earn',date:d,pt:p,label:n});save();render();playSound();setTimeout(celebrate,50);},'登録')},
  pick(d){const c=S.chores.find(x=>x.id===d.id);$('#en').value=c.name;$('#ep').value=c.pt;document.querySelectorAll('.chip').forEach(e=>e.classList.toggle('on',e.dataset.id===d.id))},
  spend(){
   const b=bal(V.kid),labels=[...new Set(S.log.filter(l=>l.type==='spend').map(l=>l.label))];
