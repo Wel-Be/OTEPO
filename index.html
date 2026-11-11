@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>オテポ（OTEPO）</title>
+<meta name="theme-color" content="#E9B44C">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F6EFDC;--card:#fff;--ink:#4A3426;--sub:#8A7360;--y:#E9B44C;--o:#D98A3D;--line:#EADFC6;--red:#B5533C;--ok:#6E8F5A}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Zen Maru Gothic","Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;font-weight:500;line-height:1.5;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+#app{max-width:560px;margin:0 auto;padding:16px 16px 48px}
+h1,h2,h3{margin:0;font-weight:900}
+.top{display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.top h2{flex:1;font-size:20px}
+.logo{font-size:26px;letter-spacing:.04em;color:var(--o)}
+.tag{color:var(--sub);font-size:13px;margin:0 0 14px}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 1px 0 var(--line)}
+.btn{appearance:none;border:0;font:inherit;font-weight:700;background:var(--y);color:var(--ink);min-height:48px;padding:0 18px;border-radius:14px;cursor:pointer}
+.btn.o{background:var(--o);color:#fff}
+.btn.g{background:#fff;border:2px solid var(--line)}
+.btn.d{background:#fff;color:var(--red);border:2px solid var(--line)}
+.btn.s{min-height:36px;padding:0 12px;font-size:14px;border-radius:10px}
+.btn.w{width:100%}
+.btn:active{transform:scale(.97)}
+.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--o);outline-offset:2px}
+.row{display:flex;gap:8px;align-items:center}
+.row>.grow{flex:1;min-width:0}
+.kid{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:0;font:inherit;color:inherit;background:var(--card);border-radius:18px;padding:14px 16px;margin-bottom:10px;cursor:pointer;box-shadow:0 1px 0 var(--line)}
+.kid .nm{flex:1;font-weight:900;font-size:18px;overflow-wrap:anywhere}
+.kid .pt{font-weight:900;font-size:26px;color:var(--o)}
+.kid .pt small{font-size:13px;color:var(--sub);margin-left:2px}
+.hero{text-align:center;padding:22px 16px}
+.hero .big{font-size:60px;font-weight:900;line-height:1.1;color:var(--o)}
+.hero .big small{font-size:18px;color:var(--sub);margin-left:4px}
+.hero .nm{font-weight:900;font-size:18px;margin-bottom:6px}
+.acts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.acts .btn{min-height:56px;font-size:16px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+.cal .h{font-size:12px;color:var(--sub);padding:2px 0}
+.cal .c{min-height:54px;border-radius:10px;background:#FBF7EA;border:2px solid transparent;font:inherit;color:inherit;padding:3px 0;font-size:13px;cursor:pointer;display:flex;flex-direction:column;align-items:center}
+.cal .c.e{background:transparent;cursor:default}
+.cal .c.t{border-color:var(--y)}
+.cal .c.sel{background:#FCE9B8;border-color:var(--o)}
+.cal .c i{font-style:normal;font-size:11px;font-weight:700;line-height:1.2}
+.cal .c .a{color:var(--ok)}.cal .c .b{color:var(--red)}
+.mon{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.mon b{font-size:17px}
+.hist{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.hist:first-child{border-top:0}
+.hist .l{flex:1;min-width:0;overflow-wrap:anywhere}
+.hist .l small{display:block;color:var(--sub)}
+.hist .v{font-weight:900;font-size:18px}
+.v.a{color:var(--ok)}.v.b{color:var(--red)}
+.empty{color:var(--sub);text-align:center;padding:14px 0;margin:0}
+label{display:block;font-weight:700;font-size:14px;margin:12px 0 4px}
+input,select{width:100%;font:inherit;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:12px;min-height:48px;padding:0 12px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{appearance:none;border:2px solid var(--line);background:#fff;font:inherit;font-weight:700;color:var(--ink);border-radius:999px;padding:8px 14px;cursor:pointer;min-height:44px}
+.chip.on{background:var(--y);border-color:var(--y)}
+.chip small{color:var(--sub);margin-left:4px}
+.ov{position:fixed;inset:0;background:rgba(74,52,38,.45);display:flex;align-items:flex-end;justify-content:center;z-index:10}
+.sheet{background:var(--bg);width:100%;max-width:560px;max-height:90vh;overflow:auto;border-radius:22px 22px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
+.sheet h3{margin-bottom:6px;font-size:18px}
+.err{color:var(--red);font-size:14px;font-weight:700;min-height:20px;margin:8px 0 0}
+.cel{align-items:center}
+.cel .box{background:#fff;border-radius:24px;padding:28px 36px;text-align:center;margin:0 20px;animation:pop .45s cubic-bezier(.2,1.4,.4,1)}
+.cel .msg{font-size:26px;font-weight:900;margin-top:8px}
+.cel .box svg{animation:spin 1s ease-out}
+@keyframes pop{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes spin{from{transform:rotateY(0)}to{transform:rotateY(720deg)}}
+.note{color:var(--sub);font-size:13px}
+.ver{margin:0 0 10px;padding:0 0 10px;border-bottom:1px solid var(--line)}
+.ver ul{margin:4px 0 0;padding-left:20px}
+a{color:var(--o);font-weight:700}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+<script data-goatcounter="https://wel-be.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<div id="modal"></div>
+<script>
+const VER='1.0.0',KEY='otepo.data.v1',OFUSE='https://ofuse.me/f3a8ad6a';
+const NOTES=[{v:'1.0.0',d:'2026-11-11',t:['オテポを公開しました。お手伝いでポイントをため、ごほうびと交換できます。']}];
+const MSGS=['やったね！','ありがとう！','よくできました！','すごいね！','ポイントゲット！'];
+const DEF=[['靴をならべる',1],['食器洗い',3],['お風呂掃除',3],['掃除機をかける',3],['リビングを片付ける',5]];
+const $=s=>document.querySelector(s);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const p2=n=>String(n).padStart(2,'0');
+const ymd=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate());
+const today=()=>ymd(new Date());
+const fmt=s=>{const [y,m,d]=s.split('-');return y+'年'+(+m)+'月'+(+d)+'日'};
+let S=load();
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.kids))return s}catch(e){}
+ return{kids:[],chores:DEF.map(([name,pt])=>({id:uid(),name,pt})),log:[],seen:null}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){alert('保存できませんでした。ブラウザの設定を確認してください。')}}
+const V={v:'list',kid:null,month:new Date(new Date().getFullYear(),new Date().getMonth(),1),sel:null};
+const bal=id=>S.log.filter(l=>l.kid===id).reduce((a,l)=>a+(l.type==='earn'?l.pt:-l.pt),0);
+const coin=(s=40)=>`<svg width="${s}" height="${s}" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="#E9B44C"/><circle cx="20" cy="20" r="13" fill="#F3CF7A" stroke="#D98A3D" stroke-width="2"/><path d="M20 12l2.4 5 5.4.7-4 3.7 1 5.4-4.8-2.7-4.8 2.7 1-5.4-4-3.7 5.4-.7z" fill="#D98A3D"/></svg>`;
+const kidObj=()=>S.kids.find(k=>k.id===V.kid);
+
+/* ---------- modal helpers ---------- */
+let CB=null;
+function modal(html,cls=''){$('#modal').innerHTML=`<div class="ov ${cls}"><div class="sheet" role="dialog" aria-modal="true">${html}</div></div>`}
+function closeM(){$('#modal').innerHTML='';CB=null}
+function form(title,body,cb,ok='決定'){CB=cb;modal(`<h3>${title}</h3>${body}<p class="err" id="err" role="alert"></p><div class="row" style="margin-top:8px"><button class="btn g grow" data-a="close">キャンセル</button><button class="btn o grow" data-a="ok">${ok}</button></div>`);const i=$('.sheet input');if(i&&i.type==='text')i.focus()}
+function confirmM(msg,cb,ok='はい'){form('確認',`<p>${msg}</p>`,cb,ok)}
+function fail(m){$('#err').textContent=m;return false}
+
+/* ---------- render ---------- */
+function render(){
+ const a=$('#app');
+ if(V.v==='list')a.innerHTML=listV();
+ else if(V.v==='kid'&&kidObj())a.innerHTML=kidV();
+ else if(V.v==='set')a.innerHTML=setV();
+ else{V.v='list';a.innerHTML=listV()}
+}
+function listV(){
+ return `<div class="top"><h1 class="logo">オテポ</h1><button class="btn g s" data-a="go" data-v="set">設定</button></div>
+ <p class="tag">おてつだいで、ポイントをためよう！</p>`+
+ (S.kids.length?S.kids.map(k=>`<button class="kid" data-a="openKid" data-id="${k.id}">${coin(44)}<span class="nm">${esc(k.name)}</span><span class="pt">${bal(k.id)}<small>pt</small></span></button>`).join('')
+ :`<div class="card"><p class="empty">まだ子供が登録されていません。<br>名前を追加してはじめましょう。</p></div>`)+
+ `<button class="btn o w" style="min-height:54px" data-a="addKid">＋ 子供を追加</button>`;
+}
+function kidV(){
+ const k=kidObj(),y=V.month.getFullYear(),m=V.month.getMonth();
+ const first=new Date(y,m,1).getDay(),n=new Date(y,m+1,0).getDate(),t=today();
+ const mine=S.log.filter(l=>l.kid===k.id);
+ const sums={};mine.forEach(l=>{const s=sums[l.date]||(sums[l.date]={a:0,b:0});l.type==='earn'?s.a+=l.pt:s.b+=l.pt});
+ let cells=['日','月','火','水','木','金','土'].map(d=>`<div class="h">${d}</div>`).join('');
+ for(let i=0;i<first;i++)cells+='<div class="c e"></div>';
+ for(let d=1;d<=n;d++){const ds=y+'-'+p2(m+1)+'-'+p2(d),s=sums[ds];
+  cells+=`<button class="c${ds===t?' t':''}${ds===V.sel?' sel':''}" data-a="selDay" data-d="${ds}" aria-label="${fmt(ds)}">${d}${s&&s.a?`<i class="a">+${s.a}</i>`:''}${s&&s.b?`<i class="b">−${s.b}</i>`:''}</button>`}
+ const list=(V.sel?mine.filter(l=>l.date===V.sel):mine).slice().reverse().sort((a,b)=>b.date.localeCompare(a.date));
+ return `<div class="top"><button class="btn g s" data-a="go" data-v="list">← 戻る</button><h2></h2></div>
+ <div class="card hero"><div class="nm">${esc(k.name)}</div>${coin(48)}<div class="big">${bal(k.id)}<small>pt</small></div></div>
+ <div class="acts"><button class="btn o" data-a="earn">ポイントをもらう</button><button class="btn" data-a="spend">ポイントを使う</button></div>
+ <div class="card"><div class="mon"><button class="btn g s" data-a="mon" data-n="-1" aria-label="前の月">◀</button><b>${y}年${m+1}月</b><button class="btn g s" data-a="mon" data-n="1" aria-label="次の月">▶</button></div><div class="cal">${cells}</div></div>
+ <div class="card"><div class="mon"><b>${V.sel?fmt(V.sel)+'の履歴':'すべての履歴'}</b>${V.sel?'<button class="btn g s" data-a="selDay" data-d="">すべて表示</button>':''}</div>
+ ${list.length?list.map(l=>`<div class="hist"><div class="l">${esc(l.label)}<small>${fmt(l.date)}</small></div><div class="v ${l.type==='earn'?'a':'b'}">${l.type==='earn'?'+':'−'}${l.pt}</div>${l.type==='spend'?`<button class="btn d s" data-a="undo" data-id="${l.id}">取り消し</button>`:''}</div>`).join(''):'<p class="empty">履歴はまだありません</p>'}</div>`;
+}
+function setV(){
+ return `<div class="top"><button class="btn g s" data-a="go" data-v="list">← 戻る</button><h2>設定</h2></div>
+ <div class="card"><h3>子供の管理</h3>${S.kids.length?S.kids.map(k=>`<div class="hist"><div class="l">${esc(k.name)}</div><button class="btn g s" data-a="renKid" data-id="${k.id}">名前変更</button><button class="btn d s" data-a="delKid" data-id="${k.id}">削除</button></div>`).join(''):'<p class="empty">子供が登録されていません</p>'}<button class="btn w" style="margin-top:8px" data-a="addKid">＋ 子供を追加</button></div>
+ <div class="card"><h3>お手伝いの管理</h3>${S.chores.length?S.chores.map(c=>`<div class="hist"><div class="l">${esc(c.name)}<small>${c.pt}pt</small></div><button class="btn g s" data-a="editChore" data-id="${c.id}">編集</button><button class="btn d s" data-a="delChore" data-id="${c.id}">削除</button></div>`).join(''):'<p class="empty">お手伝いが登録されていません</p>'}<button class="btn w" style="margin-top:8px" data-a="editChore" data-id="">＋ お手伝いを追加</button></div>
+ <div class="card"><h3>アプリ情報</h3><p>オテポ（OTEPO）<br>おてつだいで、ポイントをためよう！<br><span class="note">開発者：Wel (Be)</span></p>
+ <p class="note">データはこの端末のブラウザ内にだけ保存されます。ブラウザのデータ消去・故障・機種変更で消えると復元できません。</p>
+ <div class="row"><span class="grow">バージョン ${VER}</span><button class="btn g s" data-a="notes">更新内容</button></div></div>
+ <div class="card"><a href="${OFUSE}" target="_blank" rel="noopener">改善のアイディア・応援はこちら</a></div>`;
+}
+function notesHtml(){return NOTES.map(n=>`<div class="ver"><b>${n.v}</b> <span class="note">${n.d}</span><ul>${n.t.map(t=>`<li>${esc(t)}</li>`).join('')}</ul></div>`).join('')}
+
+/* ---------- actions ---------- */
+const A={
+ close:closeM,
+ ok(){if(CB&&CB()!==false)closeM()},
+ go(d){V.v=d.v;V.sel=null;render();scrollTo(0,0)},
+ openKid(d){V.kid=d.id;V.v='kid';V.sel=null;const n=new Date();V.month=new Date(n.getFullYear(),n.getMonth(),1);render();scrollTo(0,0)},
+ mon(d){V.month=new Date(V.month.getFullYear(),V.month.getMonth()+ +d.n,1);render()},
+ selDay(d){V.sel=d.d&&d.d!==V.sel?d.d:null;render()},
+ addKid(){form('子供を追加','<label for="nm">名前</label><input id="nm" type="text" maxlength="30" autocomplete="off">',()=>{const n=$('#nm').value.trim();if(!n)return fail('名前を入力してください');S.kids.push({id:uid(),name:n});save();render()},'追加')},
+ renKid(d){const k=S.kids.find(x=>x.id===d.id);form('名前を変更',`<label for="nm">名前</label><input id="nm" type="text" maxlength="30" value="${esc(k.name)}">`,()=>{const n=$('#nm').value.trim();if(!n)return fail('名前を入力してください');k.name=n;save();render()},'変更')},
+ delKid(d){const k=S.kids.find(x=>x.id===d.id);confirmM(`「${esc(k.name)}」を削除しますか？<br>ポイントや履歴もすべて消え、元に戻せません。`,()=>{S.kids=S.kids.filter(x=>x.id!==k.id);S.log=S.log.filter(l=>l.kid!==k.id);save();render()},'削除する')},
+ editChore(d){const c=S.chores.find(x=>x.id===d.id);form(c?'お手伝いを編集':'お手伝いを追加',`<label for="cn">お手伝いの名前</label><input id="cn" type="text" maxlength="30" value="${c?esc(c.name):''}"><label for="cp">獲得ポイント</label><input id="cp" type="number" inputmode="numeric" min="1" step="1" value="${c?c.pt:''}">`,()=>{const n=$('#cn').value.trim(),p=Number($('#cp').value);if(!n)return fail('名前を入力してください');if(!Number.isInteger(p)||p<1)return fail('ポイントは1以上の整数で入力してください');if(c){c.name=n;c.pt=p}else S.chores.push({id:uid(),name:n,pt:p});save();render()},'保存')},
+ delChore(d){const c=S.chores.find(x=>x.id===d.id);confirmM(`「${esc(c.name)}」を削除しますか？<br>過去の獲得履歴は残ります。`,()=>{S.chores=S.chores.filter(x=>x.id!==c.id);save();render()},'削除する')},
+ notes(){modal(`<h3>更新内容</h3>${notesHtml()}<button class="btn o w" data-a="close">閉じる</button>`)},
+ earn(){
+  form('ポイントをもらう',`<label>お手伝いを選ぶ</label><div class="chips">${S.chores.map(c=>`<button type="button" class="chip" data-a="pick" data-id="${c.id}">${esc(c.name)}<small>${c.pt}pt</small></button>`).join('')||'<span class="note">登録済みのお手伝いはありません</span>'}</div>
+  <label for="en">お手伝いの内容（自由に入力もできます）</label><input id="en" type="text" maxlength="40">
+  <label for="ep">ポイント</label><input id="ep" type="number" inputmode="numeric" min="1" step="1">
+  <label for="ed">日付</label><input id="ed" type="date" max="${today()}" value="${today()}">`,()=>{
+   const n=$('#en').value.trim(),p=Number($('#ep').value),d=$('#ed').value;
+   if(!n)return fail('お手伝いの内容を入力してください');
+   if(!Number.isInteger(p)||p<1)return fail('ポイントは1以上の整数で入力してください');
+   if(!d||d>today())return fail('日付は今日以前を選んでください');
+   S.log.push({id:uid(),kid:V.kid,type:'earn',date:d,pt:p,label:n});save();render();setTimeout(celebrate,50);},'登録')},
+ pick(d){const c=S.chores.find(x=>x.id===d.id);$('#en').value=c.name;$('#ep').value=c.pt;document.querySelectorAll('.chip').forEach(e=>e.classList.toggle('on',e.dataset.id===d.id))},
+ spend(){
+  const b=bal(V.kid),labels=[...new Set(S.log.filter(l=>l.type==='spend').map(l=>l.label))];
+  form('ポイントを使う',`<p class="note">いまのポイント：<b>${b}pt</b></p><label for="sp">使うポイント</label><input id="sp" type="number" inputmode="numeric" min="1" step="1">
+  <label for="sl">交換するもの・理由</label><input id="sl" type="text" maxlength="40" list="sll" autocomplete="off"><datalist id="sll">${labels.map(l=>`<option value="${esc(l)}">`).join('')}</datalist>
+  <p class="note">交換日：${fmt(today())}</p>`,()=>{
+   const p=Number($('#sp').value),n=$('#sl').value.trim();
+   if(!Number.isInteger(p)||p<1)return fail('ポイントは1以上の整数で入力してください');
+   if(p>bal(V.kid))return fail('ポイントが足りません');
+   if(!n)return fail('交換するものを入力してください');
+   S.log.push({id:uid(),kid:V.kid,type:'spend',date:today(),pt:p,label:n});save();render();},'交換する')},
+ undo(d){const l=S.log.find(x=>x.id===d.id);confirmM(`「${esc(l.label)}」（${l.pt}pt）の交換を取り消しますか？<br>使ったポイントは元に戻ります。`,()=>{S.log=S.log.filter(x=>x.id!==l.id);save();render()},'取り消す')}
+};
+function celebrate(){
+ modal(`<div class="box">${coin(72)}<div class="msg">${MSGS[Math.floor(Math.random()*MSGS.length)]}</div></div>`.replace('class="sheet"',''),'cel');
+ const ov=$('#modal .ov'),sh=$('#modal .sheet');sh.style.cssText='background:none;padding:0;width:auto;border-radius:0;overflow:visible';
+ const t=setTimeout(closeM,1800);ov.addEventListener('click',()=>clearTimeout(t),{once:true});
+}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-a]');
+ if(b){e.preventDefault();A[b.dataset.a]&&A[b.dataset.a](b.dataset);return}
+ if(e.target.classList.contains('ov'))closeM();
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape')closeM();
+ if(e.key==='Enter'&&CB&&e.target.tagName==='INPUT'&&e.target.type!=='date'){e.preventDefault();A.ok()}
+});
+
+/* ---------- start ---------- */
+render();
+if(S.seen&&S.seen!==VER){const n=NOTES.find(x=>x.v===VER);if(n)modal(`<h3>オテポが更新されました（${VER}）</h3>${notesHtml()}<button class="btn o w" data-a="close">OK</button>`)}
+S.seen=VER;save();
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
