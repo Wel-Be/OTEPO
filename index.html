@@ -96,8 +96,8 @@ a{color:var(--o);font-weight:700}
 <div id="app"></div>
 <div id="modal"></div>
 <script>
-const VER='1.4.0',KEY='otepo.data.v1',OFUSE='https://ofuse.me/f3a8ad6a';
-const NOTES=[{v:'1.0.0',d:'2026-11-11',t:['オテポを公開しました。お手伝いでポイントをため、ごほうびと交換できます。']},{v:'1.4.0',d:'2026-11-12',t:['設定に「アプリのインストール方法」を追加しました']},{v:'1.3.0',d:'2026-11-11',t:['設定の表記を「おてつだいするひと」「おてつだい」に変更しました','「お手伝いする人を追加」に表記を変更しました','お手伝いする人ごとにコインの色を選べるようになりました']},{v:'1.2.0',d:'2026-11-11',t:['設定の歯車を大きく見やすくし、枠をなくしました','効果音を「チャリン、チャリン」と2回続けて鳴らすようにしました']},{v:'1.1.0',d:'2026-11-11',t:['設定ボタンを右上の歯車マークにしました','ポイントをもらったときに効果音が鳴るようになりました','初期画面のタイトルにOTEPOの表記を追加しました']}];
+const VER='1.5.0',KEY='otepo.data.v1',OFUSE='https://ofuse.me/f3a8ad6a';
+const NOTES=[{v:'1.0.0',d:'2026-11-11',t:['オテポを公開しました。お手伝いでポイントをため、ごほうびと交換できます。']},{v:'1.5.0',d:'2026-11-17',t:['まちがえて登録した記録を、履歴の「編集」から修正・削除できるようになりました']},{v:'1.4.0',d:'2026-11-12',t:['設定に「アプリのインストール方法」を追加しました']},{v:'1.3.0',d:'2026-11-11',t:['設定の表記を「おてつだいするひと」「おてつだい」に変更しました','「お手伝いする人を追加」に表記を変更しました','お手伝いする人ごとにコインの色を選べるようになりました']},{v:'1.2.0',d:'2026-11-11',t:['設定の歯車を大きく見やすくし、枠をなくしました','効果音を「チャリン、チャリン」と2回続けて鳴らすようにしました']},{v:'1.1.0',d:'2026-11-11',t:['設定ボタンを右上の歯車マークにしました','ポイントをもらったときに効果音が鳴るようになりました','初期画面のタイトルにOTEPOの表記を追加しました']}];
 const MSGS=['やったね！','ありがとう！','よくできました！','すごいね！','ポイントゲット！'];
 const DEF=[['靴をならべる',1],['食器洗い',3],['お風呂掃除',3],['掃除機をかける',3],['リビングを片付ける',5]];
 const $=s=>document.querySelector(s);
@@ -134,6 +134,7 @@ function modal(html,cls=''){$('#modal').innerHTML=`<div class="ov ${cls}"><div c
 function closeM(){$('#modal').innerHTML='';CB=null}
 function form(title,body,cb,ok='決定'){CB=cb;modal(`<h3>${title}</h3>${body}<p class="err" id="err" role="alert"></p><div class="row" style="margin-top:8px"><button class="btn g grow" data-a="close">キャンセル</button><button class="btn o grow" data-a="ok">${ok}</button></div>`);const i=$('.sheet input');if(i&&i.type==='text')i.focus()}
 function confirmM(msg,cb,ok='はい'){form('確認',`<p>${msg}</p>`,cb,ok)}
+function info(m){modal(`<h3>お知らせ</h3><p>${m}</p><button class="btn o w" data-a="close">閉じる</button>`)}
 function fail(m){$('#err').textContent=m;return false}
 
 /* ---------- render ---------- */
@@ -166,7 +167,7 @@ function kidV(){
  <div class="acts"><button class="btn o" data-a="earn">ポイントをもらう</button><button class="btn" data-a="spend">ポイントを使う</button></div>
  <div class="card"><div class="mon"><button class="btn g s" data-a="mon" data-n="-1" aria-label="前の月">◀</button><b>${y}年${m+1}月</b><button class="btn g s" data-a="mon" data-n="1" aria-label="次の月">▶</button></div><div class="cal">${cells}</div></div>
  <div class="card"><div class="mon"><b>${V.sel?fmt(V.sel)+'の履歴':'すべての履歴'}</b>${V.sel?'<button class="btn g s" data-a="selDay" data-d="">すべて表示</button>':''}</div>
- ${list.length?list.map(l=>`<div class="hist"><div class="l">${esc(l.label)}<small>${fmt(l.date)}</small></div><div class="v ${l.type==='earn'?'a':'b'}">${l.type==='earn'?'+':'−'}${l.pt}</div>${l.type==='spend'?`<button class="btn d s" data-a="undo" data-id="${l.id}">取り消し</button>`:''}</div>`).join(''):'<p class="empty">履歴はまだありません</p>'}</div>`;
+ ${list.length?list.map(l=>`<div class="hist"><div class="l">${esc(l.label)}<small>${fmt(l.date)}</small></div><div class="v ${l.type==='earn'?'a':'b'}">${l.type==='earn'?'+':'−'}${l.pt}</div><button class="btn g s" data-a="editLog" data-id="${l.id}">編集</button></div>`).join(''):'<p class="empty">履歴はまだありません</p>'}</div>`;
 }
 function setV(){
  return `<div class="top"><button class="btn g s" data-a="go" data-v="list">← 戻る</button><h2>設定</h2></div>
@@ -218,7 +219,29 @@ const A={
    if(p>bal(V.kid))return fail('ポイントが足りません');
    if(!n)return fail('交換するものを入力してください');
    S.log.push({id:uid(),kid:V.kid,type:'spend',date:today(),pt:p,label:n});save();render();},'交換する')},
- undo(d){const l=S.log.find(x=>x.id===d.id);confirmM(`「${esc(l.label)}」（${l.pt}pt）の交換を取り消しますか？<br>使ったポイントは元に戻ります。`,()=>{S.log=S.log.filter(x=>x.id!==l.id);save();render()},'取り消す')}
+ editLog(d){const l=S.log.find(x=>x.id===d.id);if(!l)return;
+  if(l.type==='earn'){
+   form('記録を編集',`<label for="en">お手伝いの内容</label><input id="en" type="text" maxlength="40" value="${esc(l.label)}"><label for="ep">ポイント</label><input id="ep" type="number" inputmode="numeric" min="1" step="1" value="${l.pt}"><label for="ed">日付</label><input id="ed" type="date" max="${today()}" value="${l.date}"><button type="button" class="btn d w" style="margin-top:14px" data-a="delLog" data-id="${l.id}">この記録を削除</button>`,()=>{
+    const n=$('#en').value.trim(),p=Number($('#ep').value),dt=$('#ed').value;
+    if(!n)return fail('お手伝いの内容を入力してください');
+    if(!Number.isInteger(p)||p<1)return fail('ポイントは1以上の整数で入力してください');
+    if(!dt||dt>today())return fail('日付は今日以前を選んでください');
+    if(bal(l.kid)-l.pt+p<0)return fail('すでに使ったポイントが足りなくなるため、この数には変更できません');
+    l.label=n;l.pt=p;l.date=dt;save();render()},'保存')
+  }else{
+   const labels=[...new Set(S.log.filter(x=>x.type==='spend').map(x=>x.label))];
+   form('交換を編集',`<p class="note">交換日：${fmt(l.date)}</p><label for="sp">使ったポイント</label><input id="sp" type="number" inputmode="numeric" min="1" step="1" value="${l.pt}"><label for="sl">交換したもの・理由</label><input id="sl" type="text" maxlength="40" list="sll" value="${esc(l.label)}" autocomplete="off"><datalist id="sll">${labels.map(x=>`<option value="${esc(x)}">`).join('')}</datalist><button type="button" class="btn d w" style="margin-top:14px" data-a="delLog" data-id="${l.id}">この交換を取り消す</button>`,()=>{
+    const p=Number($('#sp').value),n=$('#sl').value.trim();
+    if(!Number.isInteger(p)||p<1)return fail('ポイントは1以上の整数で入力してください');
+    if(!n)return fail('交換したものを入力してください');
+    if(bal(l.kid)+l.pt-p<0)return fail('ポイントが足りません');
+    l.pt=p;l.label=n;save();render()},'保存')
+  }},
+ delLog(d){const l=S.log.find(x=>x.id===d.id);if(!l)return;
+  if(l.type==='earn'){
+   if(bal(l.kid)-l.pt<0)return info('すでに交換で使ったポイントがあるため、削除できません。先に交換を取り消してください。');
+   confirmM(`「${esc(l.label)}」（${l.pt}pt）の記録を削除しますか？<br>ポイントが${l.pt}pt減ります。`,()=>{S.log=S.log.filter(x=>x.id!==l.id);save();render()},'削除する')
+  }else confirmM(`「${esc(l.label)}」（${l.pt}pt）の交換を取り消しますか？<br>使ったポイントは元に戻ります。`,()=>{S.log=S.log.filter(x=>x.id!==l.id);save();render()},'取り消す')},
 };
 function celebrate(){
  modal(`<div class="box">${coin(72,kidObj()?kidObj().color:0)}<div class="msg">${MSGS[Math.floor(Math.random()*MSGS.length)]}</div></div>`.replace('class="sheet"',''),'cel');
